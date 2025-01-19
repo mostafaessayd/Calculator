@@ -112,7 +112,7 @@ function isTrueOperation() {
 }
 
 function f() {
-    console.log(isTrueOperation());
+   // console.log(isTrueOperation());
 }
 
 
