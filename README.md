@@ -5,3 +5,4 @@
  - Verify the regularity of the brackets in the operation
  - Verify the validity of the input operation using NFA
  - Calculate the result priority 
+ - Keep previous operations and their results in a file
