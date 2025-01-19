@@ -6,3 +6,7 @@
  - Verify the validity of the input operation using [DFA](https://www.geeksforgeeks.org/introduction-of-finite-automata/)
  - Calculate the result using priority 
  - Keep previous operations and their results in a file
+
+ ### Here is the program running
+ - When entering an incorrect operation
+ ![Image](https://github.com/user-attachments/assets/385da44d-2cf4-46b0-8842-409197093ff0)
