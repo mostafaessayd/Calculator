@@ -4,5 +4,5 @@
  ### Here are the methods used in this project
  - Verify the regularity of the brackets in the operation
  - Verify the validity of the input operation using NFA
- - Calculate the result priority 
+ - Calculate the result using priority 
  - Keep previous operations and their results in a file
