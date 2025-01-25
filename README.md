@@ -9,4 +9,3 @@
 
  ### Here is the program running
  - When entering an incorrect operation
- ![Image](https://github.com/user-attachments/assets/385da44d-2cf4-46b0-8842-409197093ff0)

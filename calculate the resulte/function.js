@@ -1,35 +1,3 @@
-// Insert the letter at the given position
-function insertLetterAtPosition(word, letter, position) {
-    return word.slice(0, position) + letter + word.slice(position);
-}
-
-// add parenthesses to the operation
-function addParenthesses() {
-    var operation = document.getElementById('display-area').value;
-    for (let i = 0; i < operation.length; ) {
-        console.log(i);
-        if (!isNaN(operation[i])) {
-            var j = i;
-            var isDigit = true;
-            while (j < operation.length && operation[j] != '+' && operation[j] != '-') {
-                isDigit &= (!isNaN(operation[j]));
-                j++;
-            }
-            if (!isDigit) {
-                operation = insertLetterAtPosition(operation , '(' , i);
-                operation = insertLetterAtPosition(operation , ')' , j + 1);
-                i = j + 3;
-            } else {
-               // i = j;
-            }
-        }
-    }
-
-    document.getElementById('display-area').value = operation;
-
-    //getResulteOfSecondType(operation);
-}
-
 // get the resulte of operation contain just add and subtract
 function getResulteOfFirstType(operation) {
 
@@ -42,18 +10,17 @@ function getResulteOfFirstType(operation) {
         var op = operation[i];
         i++;
         var nbr = "";
-        while (i < operation.length && !isNaN(operation[i])) {
+        while (i < operation.length && (!isNaN(operation[i]) || operation[i] == '.')) {
             nbr += operation[i];
             i++;
         }
         if (op == '+') {
-            res += parseInt(nbr);
+            res += parseFloat(nbr);
         } else {
-            res -= parseInt(nbr);
+            res -= parseFloat(nbr);
         }
     }
 
-    document.getElementById('display-area').value = res.toString();
     return res.toString();
 }
 
@@ -62,7 +29,7 @@ function getResulteOfSecondType(operation) {
     var res = 0;
     var nbr = "";
     var i = 0;
-    while (i < operation.length && !isNaN(operation[i])) {
+    while (i < operation.length && (!isNaN(operation[i]) || operation[i] == '.')) {
         nbr += operation[i];
         i++;
     }
@@ -72,19 +39,18 @@ function getResulteOfSecondType(operation) {
         var op = operation[i];
         i++;
         nbr = "";
-        while (i < operation.length && !isNaN(operation[i])) {
+        while (i < operation.length && (!isNaN(operation[i]) || operation[i] == '.')) {
             nbr += operation[i];
             i++;
         }
 
         if (op == '*') {
-            res *= parseInt(nbr);
+            res *= parseFloat(nbr);
         } else {
-            res /= parseInt(nbr);
+            res /= parseFloat(nbr);
         }
     }
 
-    document.getElementById('display-area').value = res.toString();
     return res.toString();
 }
 
@@ -102,10 +68,9 @@ function checkToken(operation) {
 // get the substring start from l into r from string s
 function getSubString(word, l, r) {
     var res = "";
-    for (let i = l + 1; i < r; i++) {
+    for (let i = l ; i <= r; i++) {
         res += word[i];
     }
-
     return res;
 }
 
@@ -115,30 +80,50 @@ function eraseSubstring(word, newSubstring, l, r) {
     for (let i = 0; i < l; i++) {
         res += word[i];
     }
-    
+
     res += newSubstring;
 
-    for (let i = r + 1 ; i < word.length ; i++) {
+    for (let i = r + 1; i < word.length; i++) {
         res += word[i];
     }
 
     return res;
 }
 
-// get type of operation
-function getTypeOfOperation(operation) {
-    var first = false;
+// remove extra brackets
+function removeExtraBrackets(operation) {
+    var listOfExtraBrackets = [];
     for (let i = 0; i < operation.length; i++) {
-        first |= (operation[i] == '+' || operation[i] == '-');
+        if (operation[i] == '(') {
+            let j = i + 1;
+            var isNumber = true;
+            while (j < operation.length && operation[j] != ')') {
+                isNumber &= (operation[j] == '.' || !isNaN(operation[j]));
+                j++;
+            }
+            if (j < operation.length && operation[j] == ')' && isNumber) {
+                listOfExtraBrackets.push(i);
+                listOfExtraBrackets.push(j);
+            }
+        }
     }
 
-    return (first ? 1 : 2);
+    var newOperation = "";
+    for (let i = 0; i < operation.length; i++) {
+        if (listOfExtraBrackets.includes(i)) {
+            continue;
+        }
+        newOperation += operation[i];
+    }
+
+    return newOperation;
 }
 
 // funcion to split operations
 function split() {
     var operation = document.getElementById('display-area').value;
     while (!checkToken(operation)) {
+        operation = removeExtraBrackets(operation);
         for (let i = 0; i < operation.length - 1; i++) {
             if (operation[i] == '(') {
                 var j = i + 1;
@@ -146,21 +131,66 @@ function split() {
                     j++;
                 }
                 if (operation[j] == ')') {
-                    var op = getSubString(operation, i, j);
-                    var res = "";
-                    if (getTypeOfOperation(op) == 1) {
-                        res = getResulteOfFirstType(op);
-                    } else {
-                        res = getResulteOfSecondType(op);
-                    }
-                    console.log(op + ' ' + res);
-                    operation = eraseSubstring(operation, res, i, j);
+                    var op = getSubString(operation, i + 1 , j - 1);
+                    operation = eraseSubstring(operation, getResulteOf(op), i, j);
                 }
             }
         }
-        console.log(checkToken(operation));
     }
-    
+
+    operation = getResulteOf(operation);
+    return operation;
+}
+
+// check string is operation or not
+function isOperation(operation) {
+    var hasToken = false;
+    for (let i = 0; i < operation.length; i++) {
+        hasToken |= (operation[i] == '-' || operation[i] == '+' || operation[i] == '*' || operation[i] == '/');
+    }
+
+    if(!hasToken) {
+        return false;
+    }
+    return !isNaN(operation[0]) && !isNaN(operation[operation.length - 1]);
+}
+
+// get resulte of operation
+function getResulteOf(operation) {
+    var n = operation.length;
+    for(let i = 0 ; i < n ; ) {
+        if(!isNaN(operation[i])) {
+            let j = i;
+            var op = "";
+            while(j < n && (!isNaN(operation[j]) || operation[j] == '.') || operation[j] == '/' || operation[j] == '*') {
+                op += operation[j];
+                j++;
+            }
+
+            if(isOperation(op)) {
+                var x = operation;
+                operation = eraseSubstring(operation , getResulteOfSecondType(op) , i , j - 1);
+                n = operation.length;
+                i = 0;
+            } else {
+                i++;
+            }
+        } else {
+            i++;
+        }
+    }
+
     operation = getResulteOfFirstType(operation);
+
+    return operation.toString();
+}
+
+// get final resulte
+function getFinalRes() {
+    if(!checkExpression() || !isTrueOperation()) {
+        alert('The entered operation is incorrect');
+        return;
+    }
+    var operation = split();
     document.getElementById('display-area').value = operation;
 }

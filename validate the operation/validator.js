@@ -111,8 +111,4 @@ function isTrueOperation() {
     return (initialState == 2);
 }
 
-function f() {
-   // console.log(isTrueOperation());
-}
-
 
